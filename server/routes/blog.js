@@ -9,16 +9,12 @@ router.get("/", function (req, res) {
 });
 
 router.get("/posts", async function (req, res) {
-  console.log("entrei");
   const query = `SELECT posts.*, authors.name AS author_name 
                   FROM posts
                 INNER JOIN authors ON posts.author_id = authors.id`;
   const [posts] = await db.query(query);
-  console.log(posts);
-  //res.json(posts);
-  res.send(posts);
 
-  //res.render("posts-list", { posts: posts });
+  res.send(posts);
 });
 
 router.get("/new-post", async function (req, res) {
@@ -82,9 +78,12 @@ router.post("/posts/:id/edit", async function (req, res) {
 });
 
 router.post("/posts/:id/delete", async function (req, res) {
-  const query = `DELETE FROM posts WHERE id = ?`;
-  await db.query(query, [req.params.id]);
-
-  res.redirect("/posts");
+  try {
+    const query = `DELETE FROM posts WHERE id = ?`;
+    await db.query(query, [req.body.id]);
+    return res.status(200).json({ success: "Inserted success" });
+  } catch (error) {
+    return res.status(500).json({ error: error });
+  }
 });
 module.exports = router;
