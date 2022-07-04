@@ -18,7 +18,7 @@ export default function MuiCard({ post }) {
         let response = await fetch(`http://localhost:3000/posts`);
         if (response) {
           let data = await response.json();
-          console.log(data);
+
           setPosts(data);
         } else {
           throw "Error fetching Posts.";
@@ -39,7 +39,7 @@ export default function MuiCard({ post }) {
           id: id,
         }),
       });
-      console.log(response);
+
       if (response.ok) {
         setPosts((prevState) => prevState.filter((post) => post.id !== id));
       }
@@ -67,7 +67,7 @@ export default function MuiCard({ post }) {
         <Button color="error" startIcon={<DeleteIcon />} onClick={() => deletePost(post.id)}>
           Delete Post
         </Button>
-        <Link to={`/posts/${post.id}`} style={{ textDecoration: "none" }}>
+        <Link to={`/posts/${post.id}/edit`} style={{ textDecoration: "none" }}>
           <Button startIcon={<EditIcon />}>Edit Post</Button>
         </Link>
         <Button color="success" startIcon={<RemoveRedEyeIcon />} onClick={() => viewPost(post.id)}>

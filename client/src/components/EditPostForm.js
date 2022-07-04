@@ -7,13 +7,13 @@ import TextareaAutosize from "@mui/material/TextareaAutosize";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Button from "@mui/material/Button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 const NewPostForm = () => {
   const [inputs, setInputs] = useState({});
-  const [authors, setAuthors] = useState([]);
   const [isError, setIsError] = useState(false);
   const navigate = useNavigate();
+  const { id } = useParams();
 
   const handleChange = (event) => {
     const name = event.target.name;
@@ -39,21 +39,23 @@ const NewPostForm = () => {
   };
 
   useEffect(() => {
-    const fetchAuthors = async () => {
+    const fetchValues = async () => {
       try {
-        let response = await fetch(`http://localhost:3000/new-post`);
+        const response = await fetch(`http://localhost:3000/posts/${id}/edit`);
+        console.log(response);
+
         if (response) {
           let data = await response.json();
           console.log(data);
-          setAuthors(data);
+          setInputs(data);
         } else {
-          throw "Error fetching authors.";
+          throw "Error fetching Values.";
         }
       } catch (error) {
         setIsError(true);
       }
     };
-    fetchAuthors();
+    fetchValues();
   }, []);
 
   return (
@@ -82,15 +84,7 @@ const NewPostForm = () => {
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Select Author</InputLabel>
             <Select id="demo-simple-select" value={inputs.author || ""} onChange={handleChange} name="author">
-              <MenuItem disabled value="">
-                <em>Select Author</em>
-              </MenuItem>
-              {authors &&
-                authors.map((author) => (
-                  <MenuItem key={author.id} value={author.id}>
-                    {author.name}
-                  </MenuItem>
-                ))}
+              <MenuItem value={"author.id"}>ASD</MenuItem>
             </Select>
           </FormControl>
         </Grid>
