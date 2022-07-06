@@ -34,33 +34,36 @@ router.post("/posts", async function (req, res) {
 });
 
 router.get("/posts/:id", async function (req, res) {
-  const query = `SELECT posts.*, authors.name AS author_name, authors.email AS author_email FROM posts
+  try {
+    const query = `SELECT posts.*, authors.name AS author_name, authors.email AS author_email FROM posts
                 INNER JOIN authors ON posts.author_id = authors.id
                 WHERE posts.id = ?`;
-  const [result] = await db.query(query, [req.params.id]);
+    const [result] = await db.query(query, [req.params.id]);
 
-  if (!result || result.length === 0) {
-    return res.status(404).render("404");
+    if (!result || result.length === 0) {
+      return res.status(404);
+    }
+
+    const postData = {
+      ...result[0],
+      date: result[0].date.toISOString(),
+      humanReadableDate: result[0].date.toLocaleDateString("pt-PT", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+    };
+
+    return res.status(200).json(postData);
+  } catch (error) {
+    return res.status(500).json({ error: error });
   }
-
-  const postData = {
-    ...result[0],
-    date: result[0].date.toISOString(),
-    humanReadableDate: result[0].date.toLocaleDateString("pt-PT", {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    }),
-  };
-  //console.log(postData);
-
-  res.render("post-detail", { post: postData });
 });
 
 router.get("/posts/:id/edit", async function (req, res) {
   try {
-    const query = `SELECT * FROM posts WHERE id = ?`;
+    const query = `SELECT posts.*, authors.name FROM posts INNER JOIN authors ON posts.author_id = authors.id WHERE posts.id = ?`;
     const [posts] = await db.query(query, [req.params.id]);
 
     if (!posts || posts.length === 0) {
@@ -73,11 +76,14 @@ router.get("/posts/:id/edit", async function (req, res) {
 });
 
 router.post("/posts/:id/edit", async function (req, res) {
-  const query = `UPDATE posts SET title = ?, summary = ?, body = ?
+  try {
+    const query = `UPDATE posts SET title = ?, summary = ?, body = ?
                 WHERE id = ?`;
-  await db.query(query, [req.body.title, req.body.summary, req.body.content, req.params.id]);
-
-  res.redirect("/posts");
+    await db.query(query, [req.body.title, req.body.summary, req.body.content, req.params.id]);
+    return res.status(200).json({ success: "Edited" });
+  } catch (error) {
+    return res.status(404).json({ error: error });
+  }
 });
 
 router.post("/posts/:id/delete", async function (req, res) {

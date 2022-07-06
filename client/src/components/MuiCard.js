@@ -47,9 +47,6 @@ export default function MuiCard({ post }) {
       console.error(error.message);
     }
   };
-  const viewPost = (id) => {
-    console.log(id);
-  };
 
   return posts.map((post) => (
     <Card sx={{ maxWidth: 900, mt: 3 }} key={post.id}>
@@ -70,9 +67,11 @@ export default function MuiCard({ post }) {
         <Link to={`/posts/${post.id}/edit`} style={{ textDecoration: "none" }}>
           <Button startIcon={<EditIcon />}>Edit Post</Button>
         </Link>
-        <Button color="success" startIcon={<RemoveRedEyeIcon />} onClick={() => viewPost(post.id)}>
-          View Post
-        </Button>
+        <Link to={`/posts/${post.id}`} style={{ textDecoration: "none" }}>
+          <Button color="success" startIcon={<RemoveRedEyeIcon />}>
+            View Post
+          </Button>
+        </Link>
       </CardActions>
     </Card>
   ));

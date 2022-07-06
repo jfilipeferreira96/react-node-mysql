@@ -23,14 +23,15 @@ const NewPostForm = () => {
 
   const onSubmitForm = async (e) => {
     e.preventDefault();
+    console.log(inputs);
     try {
-      const response = await fetch("http://localhost:3000/posts", {
+      const response = await fetch(`http://localhost:3000/posts/${id}/edit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(inputs),
       });
 
-      if (response.ok) {
+      if (response) {
         navigate("../posts", { replace: true });
       }
     } catch (error) {
@@ -42,11 +43,9 @@ const NewPostForm = () => {
     const fetchValues = async () => {
       try {
         const response = await fetch(`http://localhost:3000/posts/${id}/edit`);
-        console.log(response);
 
         if (response) {
           let data = await response.json();
-          console.log(data);
           setInputs(data);
         } else {
           throw "Error fetching Values.";
@@ -58,39 +57,58 @@ const NewPostForm = () => {
     fetchValues();
   }, []);
 
+  //if (!inputs) return <div></div>;
+
   return (
     <form onSubmit={onSubmitForm}>
       <Grid container spacing={3}>
         <Grid item xs={12} md={12}>
-          <TextField required id="cardName" label="Title" fullWidth variant="standard" name="title" onChange={handleChange} />
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <TextField required id="cardNumber" label="Summary" fullWidth variant="standard" name="summary" onChange={handleChange} />
-        </Grid>
-        <Grid item xs={12} md={12}>
-          <TextareaAutosize
-            name="content"
+          <TextField
             required
-            id="expDate"
-            label="Post Content"
-            minRows={5}
-            placeholder="Post content"
-            style={{ width: "100%" }}
+            id="cardName"
+            value={inputs.title || ""}
+            label="Title"
+            fullWidth
             variant="standard"
+            name="title"
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <TextField
+            required
+            id="cardNumber"
+            value={inputs.summary || ""}
+            label="Summary"
+            fullWidth
+            variant="standard"
+            name="summary"
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid item xs={12} md={12}>
+          <TextField
+            required
+            id="cardNumber"
+            value={inputs.content || ""}
+            label="Body"
+            fullWidth
+            variant="standard"
+            name="content"
             onChange={handleChange}
           />
         </Grid>
         <Grid item xs={12} md={12}>
           <FormControl fullWidth>
             <InputLabel id="demo-simple-select-label">Select Author</InputLabel>
-            <Select id="demo-simple-select" value={inputs.author || ""} onChange={handleChange} name="author">
-              <MenuItem value={"author.id"}>ASD</MenuItem>
+            <Select id="demo-simple-select" disabled value={inputs.author_id || ""} onChange={handleChange} name="author">
+              <MenuItem value={inputs.author_id || ""}>{inputs.name || ""}</MenuItem>
             </Select>
           </FormControl>
         </Grid>
         <Grid item xs={12} md={12}>
           <Button type="submit" fullWidth variant="contained" sx={{ mt: 1, mb: 2 }}>
-            Add Post
+            Edit Post
           </Button>
         </Grid>
       </Grid>
